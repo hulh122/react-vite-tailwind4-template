@@ -32,8 +32,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'pnpm'
-        # cache-dependency-path: 'template/pnpm-lock.yaml'
         
     - name: Install dependencies
       working-directory: ./template
