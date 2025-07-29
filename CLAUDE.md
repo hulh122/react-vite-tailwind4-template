@@ -238,6 +238,51 @@ git commit -m "Update from HTML files"
 git push         # 推送触发自动部署
 ```
 
+## Lint 常见问题和解决方案
+
+### TypeScript 类型导入问题
+当遇到 `'Type' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled` 错误时：
+
+```typescript
+// ❌ 错误的导入方式
+import { ErrorQuestionCardProps } from '../types';
+
+// ✅ 正确的导入方式  
+import type { ErrorQuestionCardProps } from '../types';
+```
+
+### 未使用变量问题
+当遇到 `'variable' is defined but never used` 错误时：
+
+```typescript
+// ❌ 错误：定义了但未使用
+const { id } = useParams<{ id: string }>();
+
+// ✅ 方法1：使用下划线前缀标记为故意未使用
+const { id: _id } = useParams<{ id: string }>();
+
+// ✅ 方法2：如果确实不需要，直接调用不解构
+useParams<{ id: string }>();
+```
+
+### React Refresh 问题
+当遇到 `Fast refresh only works when a file only exports components` 错误时：
+
+```typescript
+// ❌ 错误：在组件文件中混合导出工具函数
+export function useApp() { ... }
+
+// ✅ 正确：添加 eslint-disable 注释
+// eslint-disable-next-line react-refresh/only-export-components
+export function useApp() { ... }
+```
+
+### 自动修复lint问题命令
+```bash
+cd template
+pnpm lint --fix    # 自动修复可修复的lint问题
+```
+
 ## 项目交付检查清单
 
 - [ ] 所有 HTML 页面都已转换为 React 组件
