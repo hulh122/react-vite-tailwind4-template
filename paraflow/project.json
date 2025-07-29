@@ -1,0 +1,22 @@
+{
+  "name": "AI错题本助手（安卓 APP）",
+  "created_at": "2025-07-29T03:23:04.590392+00:00",
+  "paraflow_version": "1.0",
+  "screens": [
+    {
+      "id": "7:0",
+      "title": "错题列表页面",
+      "filename": "7:0.html"
+    },
+    {
+      "id": "8:0",
+      "title": "错题录入页面",
+      "filename": "8:0.html"
+    },
+    {
+      "id": "9:0",
+      "title": "错题详情页面",
+      "filename": "9:0.html"
+    }
+  ]
+}
