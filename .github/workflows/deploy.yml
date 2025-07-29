@@ -33,11 +33,14 @@ jobs:
       with:
         node-version: '20'
         cache: 'pnpm'
+        cache-dependency-path: 'template/pnpm-lock.yaml'
         
     - name: Install dependencies
+      working-directory: ./template
       run: pnpm install --frozen-lockfile
       
     - name: Build
+      working-directory: ./template
       run: pnpm build
       env:
         NODE_ENV: production
@@ -48,7 +51,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: './dist'
+        path: './template/dist'
         
     - name: Deploy to GitHub Pages
       id: deployment
