@@ -25,10 +25,10 @@
 
 项目目录应包含以下文件：
 - `*product_plan.md` - 产品计划文档
-- `*screen_plan.md` - 屏幕设计计划（可选）  
+- `*screen_plan.md` - 屏幕设计计划
 - `*.html` - HTML页面文件
-- `styles.css` - 自定义样式文件（可选）
-- `project.json` - 项目配置文件（可选）
+- `styles.css` - 自定义样式文件
+- `project.json` - 项目配置文件
 
 ## 执行步骤
 
@@ -76,7 +76,7 @@
 ```
 🔧 优化和完善
 ├── 修复TypeScript类型问题
-├── 添加移动端适配样式
+├── 完善功能设计
 ├── 更新项目配置信息
 └── 运行构建验证
 ```
@@ -97,10 +97,6 @@
 #### 4. TDD开发阶段
 ```
 🔴 Red -> 🟢 Green -> 🔵 Refactor
-├── 编写类型定义测试 (src/types/index.test.ts)
-├── 实现类型定义通过测试
-├── 编写状态管理测试 (src/contexts/AppContext.test.tsx)
-├── 实现状态管理通过测试
 ├── 编写组件测试用例
 ├── 实现组件功能通过测试
 └── 重构优化代码结构
@@ -116,6 +112,9 @@
 ```
 
 ## 生成的应用特性
+
+### 🎯 **完善应用功能设计**
+- 保证各页面的功能可用性
 
 ### 🎯 **精准UI还原**
 - 完全基于提供的HTML设计
@@ -134,12 +133,6 @@
 - 生成模拟数据
 - 实现状态管理
 - 配置页面导航
-
-### 📱 **移动优先**
-- 390px移动端布局
-- FontAwesome图标支持
-- 自定义阴影效果
-- 底部指示器样式
 
 ## 示例用法
 
@@ -207,28 +200,6 @@ ai-math-error-notebook-642519d0/
 └── vite.config.ts                 # 包含测试配置
 ```
 
-## 高级特性
-
-### 🔄 **状态管理自动化**
-- 基于Context API的全局状态
-- useReducer处理复杂状态变更
-- 自定义Hook简化状态访问
-
-### 🎨 **样式智能转换**
-- HTML class属性转换为className
-- 自定义CSS类名保持不变
-- Tailwind工具类自动识别
-
-### 🛣️ **路由自动配置**
-- 基于HTML文件数量生成路由
-- 支持参数路由 (`/item/:id`)
-- 自动添加导航逻辑
-
-### 📦 **模块化架构**
-- 组件化页面结构
-- 可复用的业务逻辑
-- 清晰的文件组织结构
-
 ## 构建和部署
 
 生成完成后，进入独立项目目录：
@@ -248,72 +219,6 @@ pnpm test            # 运行测试（监听模式）
 pnpm vitest run      # 运行测试（单次）
 pnpm lint            # 代码检查
 pnpm lint --fix      # 自动修复lint问题
-```
-
-### 部署到GitHub Pages
-```bash
-# 初始化Git仓库
-git init
-git add .
-git commit -m "Initial commit: AI Math Error Notebook"
-
-# 推送到GitHub（自动触发部署）
-git remote add origin https://github.com/username/ai-math-error-notebook.git
-git push -u origin main
-```
-
-应用将自动部署到：`https://username.github.io/ai-math-error-notebook/`
-
-## 注意事项
-
-⚠️ **重要提醒**：
-- 确保HTML文件结构完整且语义化
-- 产品计划文档有助于生成更准确的数据类型和应用命名
-- 自定义样式将被保留并适配到React环境
-- 生成的代码遵循React和TypeScript最佳实践
-- **新项目将创建独立目录，不会覆盖现有template**
-
-🎯 **标准开发最佳实践**：
-- 使用描述性的HTML id和class名称
-- 在产品计划中明确说明数据结构和业务逻辑
-- 保持HTML文件的一致性和规范性
-- 确保产品计划包含明确的产品名称
-
-🧪 **TDD开发最佳实践**：
-- Template 已预配置 vitest 3.2 + happy-dom 测试环境
-- 使用 `--tdd` 选项启用完整TDD开发流程
-- 遵循 Red-Green-Refactor 的TDD开发流程
-- 编写有意义的测试用例描述
-- 保持测试覆盖率在合理范围内
-- 定期运行测试确保代码质量
-
-📦 **项目管理最佳实践**：
-- 项目名称基于产品计划自动生成
-- Hash值确保项目目录唯一性
-- 每个项目都是完全独立的
-- 包含完整的部署配置
-
-## Claude Code 使用建议
-
-下一个 Claude Code 会话可以直接使用以下命令：
-
-### 快速生成应用
-```bash
-/generate-app paraflow
-```
-
-### TDD模式生成（推荐）
-```bash  
-/generate-app paraflow --tdd
-```
-
-### 验证生成结果
-```bash
-cd [生成的项目目录]
-pnpm install
-pnpm lint
-pnpm build
-pnpm test  # TDD模式
 ```
 
 这个slash command将你的静态HTML设计瞬间转换为功能完整、测试覆盖的现代React应用！
