@@ -5,20 +5,23 @@ set -e
 PROJECT_NAME=""
 REPO_DESCRIPTION=""
 GITHUB_USERNAME=""
+GITHUB_TOKEN=""
 
 usage() {
-    echo "Usage: $0 -n <project-name> -d <description> [-u <github-username>]"
+    echo "Usage: $0 -n <project-name> -d <description> [-u <github-username>] [-t <github-token>]"
     echo "  -n: Project name (required)"
     echo "  -d: Repository description (required)"
     echo "  -u: GitHub username (optional, will use gh auth status if not provided)"
+    echo "  -t: GitHub token (optional, for direct token authentication)"
     exit 1
 }
 
-while getopts "n:d:u:h" opt; do
+while getopts "n:d:u:t:h" opt; do
     case $opt in
         n) PROJECT_NAME="$OPTARG" ;;
         d) REPO_DESCRIPTION="$OPTARG" ;;
         u) GITHUB_USERNAME="$OPTARG" ;;
+        t) GITHUB_TOKEN="$OPTARG" ;;
         h) usage ;;
         *) usage ;;
     esac
@@ -37,11 +40,22 @@ if ! command -v gh &> /dev/null; then
     exit 1
 fi
 
-# Check if user is authenticated with gh
-if ! gh auth status &> /dev/null; then
-    echo "❌ Error: Not authenticated with GitHub CLI."
-    echo "Run: gh auth login"
-    exit 1
+# Handle GitHub authentication
+if [[ -n "$GITHUB_TOKEN" ]]; then
+    echo "🔑 Using provided GitHub token for authentication..."
+    export GH_TOKEN="$GITHUB_TOKEN"
+    # Test token validity
+    if ! gh auth status &> /dev/null; then
+        echo "❌ Error: Invalid GitHub token provided."
+        exit 1
+    fi
+else
+    # Check if user is authenticated with gh
+    if ! gh auth status &> /dev/null; then
+        echo "❌ Error: Not authenticated with GitHub CLI."
+        echo "Run: gh auth login or provide a token with -t <token>"
+        exit 1
+    fi
 fi
 
 # Get GitHub username if not provided
@@ -76,12 +90,26 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 fi
 
 # Check if remote repository exists
-REPO_EXISTS=$(gh repo view "$2/$PROJECT_NAME" &> /dev/null && echo "true" || echo "false")
+REPO_EXISTS=$(gh repo view "$GITHUB_USERNAME/$PROJECT_NAME" &> /dev/null && echo "true" || echo "false")
 
 if [[ "$REPO_EXISTS" == "false" ]]; then
     echo "🏗️  Creating GitHub repository..."
     gh repo create "$PROJECT_NAME" --description "$REPO_DESCRIPTION" --public --source=. --remote=origin --push
     REPO_URL="https://github.com/$GITHUB_USERNAME/$PROJECT_NAME"
+    
+    # Configure GitHub Pages immediately after repo creation
+    echo "🔧 Configuring GitHub Pages with Actions..."
+    sleep 3  # Wait for repo to be fully initialized
+    
+    # Enable GitHub Pages with Actions source
+    if gh api repos/$GITHUB_USERNAME/$PROJECT_NAME/pages \
+        --method POST \
+        --field build_type="workflow" \
+        2>/dev/null; then
+        echo "✅ GitHub Pages configured successfully"
+    else
+        echo "⚠️  Note: GitHub Pages will be auto-configured after first workflow run"
+    fi
 else
     echo "📦 Repository already exists, pushing to existing repo..."
     # Add remote if not exists
@@ -92,19 +120,20 @@ else
     REPO_URL="https://github.com/$GITHUB_USERNAME/$PROJECT_NAME"
 fi
 
-# Enable GitHub Pages with Actions source
-echo "🔧 Configuring GitHub Pages..."
-gh api repos/$GITHUB_USERNAME/$PROJECT_NAME/pages \
-    --method POST \
-    --field build_type="workflow" \
-    2>/dev/null || {
-    # If Pages already exists, update it
-    echo "📄 GitHub Pages already exists, updating configuration..."
+# Update GitHub Pages configuration for existing repos
+if [[ "$REPO_EXISTS" == "true" ]]; then
+    echo "🔧 Updating GitHub Pages configuration..."
     gh api repos/$GITHUB_USERNAME/$PROJECT_NAME/pages \
         --method PUT \
         --field build_type="workflow" \
-        2>/dev/null || echo "⚠️  Pages configuration may need manual setup"
-}
+        2>/dev/null || {
+        # If Pages doesn't exist, create it
+        gh api repos/$GITHUB_USERNAME/$PROJECT_NAME/pages \
+            --method POST \
+            --field build_type="workflow" \
+            2>/dev/null || echo "⚠️  Pages configuration may need manual setup"
+    }
+fi
 
 # Wait a moment and check if Actions workflow exists
 echo "🚀 Triggering GitHub Actions deployment..."
@@ -122,6 +151,14 @@ else
 fi
 
 echo ""
+echo ""
 echo "✅ Deployment completed successfully!"
 echo "🌐 Repository URL: $REPO_URL"
+if [[ -n "$GITHUB_TOKEN" ]]; then
+    echo "🔑 Used provided GitHub token for authentication"
+fi
 echo ""
+echo "📝 Usage examples:"
+echo "  ./deploy.sh -n my-project -d 'My awesome project'"
+echo "  ./deploy.sh -n my-project -d 'My project' -u myusername"
+echo "  ./deploy.sh -n my-project -d 'My project' -t ghp_xxxxxxxxxxxx"
