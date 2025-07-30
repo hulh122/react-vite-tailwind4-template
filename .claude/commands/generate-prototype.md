@@ -18,3 +18,4 @@
 
 ## React 注意事项
 - 在 import 类型时使用 import type
+- 在 react 函数组件中如果一个变量没有使用到则不要添加
