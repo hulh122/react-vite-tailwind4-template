@@ -6,12 +6,11 @@
 
 ```
 react-vite-tailwind4-template/
-├── .github/workflows/
-│   └── deploy.yml          # GitHub Pages 自动部署配置
-├── .gitignore              # Git 忽略文件
 ├── CLAUDE.md               # 本使用指南
 ├── README.md               # 项目说明文档
 └── template/               # React 应用模板
+    ├── .github/workflows/
+    │   └── deploy.yml      # GitHub Pages 自动部署配置
     ├── src/
     │   ├── components/
     │   │   └── Layout.tsx  # 基础布局框架
@@ -54,12 +53,11 @@ react-vite-tailwind4-template/
 ### 1. 项目初始化
 
 ```bash
-# 复制整个项目（包含部署配置）
-cp -r react-vite-tailwind4-template new-project-name
+# 复制模板目录到新项目
+cp -r react-vite-tailwind4-template/template new-project-name
 cd new-project-name
 
 # 安装依赖并启动开发
-cd template
 pnpm install
 pnpm dev
 ```
@@ -105,7 +103,7 @@ pnpm dev
    - `template/vite.config.ts` - 修改 `base` 路径为仓库名
 
 2. **Git 仓库配置**：
-   - 项目根目录已包含 `.gitignore` 和 `.github/workflows/deploy.yml`
+   - 模板目录已包含 `.github/workflows/deploy.yml` 部署配置
    - 直接推送到 GitHub 即可自动部署
 
 ### 3. HTML 到 React 转换指南
@@ -170,7 +168,6 @@ const [value, setValue] = useState('default');
 
 #### 本地构建测试
 ```bash
-cd template
 pnpm build      # 构建生产版本
 pnpm preview    # 本地预览构建结果
 ```
@@ -201,6 +198,8 @@ pnpm preview    # 本地预览构建结果
 3. 推送到 GitHub 并等待自动部署
 4. 验证线上应用功能正常
 
+**注意**：现在 `.github/workflows/deploy.yml` 位于项目内部，推送项目到 GitHub 时会自动包含部署配置。
+
 ## 常见问题和解决方案
 
 ### 构建问题
@@ -219,13 +218,12 @@ pnpm preview    # 本地预览构建结果
 2. **基于需求生成** - 所有内容都基于用户提供的 HTML 文件
 3. **遵循最佳实践** - 组件化、类型安全、性能优化
 4. **确保可部署** - 每次修改后测试构建和部署流程
-5. **完整项目复制** - 复制整个项目目录，不只是 template 文件夹
+5. **自包含项目** - 现在 template 目录包含所有必要的配置文件，包括部署配置
 
 ## 常用命令
 
 ```bash
 # 开发阶段
-cd template
 pnpm install     # 安装依赖
 pnpm dev         # 开发服务器
 pnpm build       # 生产构建
@@ -279,7 +277,6 @@ export function useApp() { ... }
 
 ### 自动修复lint问题命令
 ```bash
-cd template
 pnpm lint --fix    # 自动修复可修复的lint问题
 ```
 
