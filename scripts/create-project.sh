@@ -14,44 +14,27 @@ generate_hash() {
 
 # 显示帮助
 show_help() {
-    echo -e "${YELLOW}使用方法: ./create-project.sh <项目名称> [8位hash]${NC}"
+    echo -e "${YELLOW}使用方法: ./create-project.sh${NC}"
+    echo ""
+    echo "该脚本会自动创建名为 'paraflow-<8位hash>' 的项目"
     echo ""
     echo "示例:"
-    echo "  ./create-project.sh my-project"
-    echo "  ./create-project.sh my-project abcd1234"
+    echo "  ./create-project.sh"
     echo ""
-    echo "参数说明:"
-    echo "  项目名称    必需，英文项目名称"
-    echo "  8位hash     可选，8位字符，不提供则自动生成"
+    echo "说明:"
+    echo "  项目名称固定为 'paraflow'"
+    echo "  8位hash会自动生成"
 }
 
 # 主函数
 main() {
-    if [[ $# -eq 0 ]] || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
+    if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
         show_help
         exit 0
     fi
     
-    PROJECT_NAME="$1"
-    HASH="${2:-$(generate_hash)}"
-    
-    # 验证参数
-    if [[ -z "$PROJECT_NAME" ]]; then
-        echo -e "${RED}❌ 项目名称不能为空${NC}"
-        exit 1
-    fi
-    
-    # 验证hash长度
-    if [[ ${#HASH} -ne 8 ]]; then
-        echo -e "${RED}❌ Hash 必须是8位字符，当前长度: ${#HASH}${NC}"
-        exit 1
-    fi
-    
-    # 验证hash格式（只包含字母和数字）
-    if [[ ! "$HASH" =~ ^[a-zA-Z0-9]+$ ]]; then
-        echo -e "${RED}❌ Hash 只能包含字母和数字${NC}"
-        exit 1
-    fi
+    PROJECT_NAME="paraflow"
+    HASH="$(generate_hash)"
     
     FULL_NAME="${PROJECT_NAME}-${HASH}"
     
