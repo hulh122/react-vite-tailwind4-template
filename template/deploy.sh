@@ -94,8 +94,23 @@ REPO_EXISTS=$(gh repo view "$GITHUB_USERNAME/$PROJECT_NAME" &> /dev/null && echo
 
 if [[ "$REPO_EXISTS" == "false" ]]; then
     echo "🏗️  Creating GitHub repository..."
-    gh repo create "$PROJECT_NAME" --description "$REPO_DESCRIPTION" --public --source=. --remote=origin --push
-    REPO_URL="https://github.com/$GITHUB_USERNAME/$PROJECT_NAME"
+    
+    # Remove existing origin remote if it exists to avoid conflicts
+    if git remote get-url origin &> /dev/null; then
+        echo "🗑️  Removing existing origin remote to avoid conflicts"
+        git remote remove origin
+    fi
+    
+    # Create repository with --remote=origin flag
+    echo "📝 Creating repository with origin remote"
+    gh repo create "$PROJECT_NAME" --description "$REPO_DESCRIPTION" --public --source=. --remote=origin
+    
+    # Configure git to use gh's credentials and push
+    echo "🔧 Configuring git credentials via gh..."
+    gh auth setup-git
+    
+    echo "🚀 Pushing code to repository..."
+    git push -u origin main
     
     # Configure GitHub Pages immediately after repo creation
     echo "🔧 Configuring GitHub Pages with Actions..."
@@ -111,29 +126,12 @@ if [[ "$REPO_EXISTS" == "false" ]]; then
         echo "⚠️  Note: GitHub Pages will be auto-configured after first workflow run"
     fi
 else
-    echo "📦 Repository already exists, pushing to existing repo..."
-    # Add remote if not exists
-    if ! git remote get-url origin &> /dev/null; then
-        git remote add origin "https://github.com/$GITHUB_USERNAME/$PROJECT_NAME.git"
-    fi
-    git push -u origin main
-    REPO_URL="https://github.com/$GITHUB_USERNAME/$PROJECT_NAME"
+    echo "❌ Error: Repository '$GITHUB_USERNAME/$PROJECT_NAME' already exists on GitHub!"
+    echo "💡 Please choose a different project name or delete the existing repository first."
+    echo "🔗 Repository URL: https://github.com/$GITHUB_USERNAME/$PROJECT_NAME"
+    exit 1
 fi
 
-# Update GitHub Pages configuration for existing repos
-if [[ "$REPO_EXISTS" == "true" ]]; then
-    echo "🔧 Updating GitHub Pages configuration..."
-    gh api repos/$GITHUB_USERNAME/$PROJECT_NAME/pages \
-        --method PUT \
-        --field build_type="workflow" \
-        2>/dev/null || {
-        # If Pages doesn't exist, create it
-        gh api repos/$GITHUB_USERNAME/$PROJECT_NAME/pages \
-            --method POST \
-            --field build_type="workflow" \
-            2>/dev/null || echo "⚠️  Pages configuration may need manual setup"
-    }
-fi
 
 # Wait a moment and check if Actions workflow exists
 echo "🚀 Triggering GitHub Actions deployment..."
