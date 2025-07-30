@@ -10,7 +10,7 @@
 1. 理解 directory 中的 product_plan / screen_plan 想实现的功能以及 html 页面想实现的页面样式
 2. 执行 sh scripts/create-project.sh 创建应用模板
 3. 进入应用模板，理解其中的 React 模板结构
-4. 在应用模板中先实现应用原型功能，确保功能无误，体现应用原型能力, UI 部分直接按照 Html 的样式生成
+4. 使用 subagent 在应用模板中实现应用原型功能(确保功能无误，体现应用原型能力), UI 部分直接按照 Html 的样式生成
 5. 通过 `pnpm build` 保证编译不报错即可
 
 ## React 注意事项
