@@ -13,3 +13,7 @@
 4. 在应用模板中先实现应用原型功能，确保功能无误，体现应用原型能力, UI 部分直接按照 Html 的样式生成
 5. 通过 `pnpm build` 保证编译不报错即可
 6. 在应用模板中生成合理的 README
+7. 通过应用模板中的 deploy.sh 脚本上传到 github，并保证 actions 跑通
+
+## React 注意事项
+- 在 import 类型时使用 import type
