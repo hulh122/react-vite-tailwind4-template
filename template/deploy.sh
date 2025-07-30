@@ -91,6 +91,7 @@ fi
 
 # Check if remote repository exists
 REPO_EXISTS=$(gh repo view "$GITHUB_USERNAME/$PROJECT_NAME" &> /dev/null && echo "true" || echo "false")
+REPO_URL="https://github.com/$GITHUB_USERNAME/$PROJECT_NAME"
 
 if [[ "$REPO_EXISTS" == "false" ]]; then
     echo "🏗️  Creating GitHub repository..."
@@ -126,10 +127,55 @@ if [[ "$REPO_EXISTS" == "false" ]]; then
         echo "⚠️  Note: GitHub Pages will be auto-configured after first workflow run"
     fi
 else
-    echo "❌ Error: Repository '$GITHUB_USERNAME/$PROJECT_NAME' already exists on GitHub!"
-    echo "💡 Please choose a different project name or delete the existing repository first."
-    echo "🔗 Repository URL: https://github.com/$GITHUB_USERNAME/$PROJECT_NAME"
-    exit 1
+    echo "📁 Repository '$GITHUB_USERNAME/$PROJECT_NAME' already exists on GitHub"
+    echo "🔗 Repository URL: $REPO_URL"
+    
+    # Add origin remote if it doesn't exist
+    if ! git remote get-url origin &> /dev/null; then
+        echo "🔧 Adding origin remote..."
+        git remote add origin "https://github.com/$GITHUB_USERNAME/$PROJECT_NAME.git"
+        gh auth setup-git
+    fi
+    
+    # Fetch latest changes from remote
+    echo "🔄 Fetching latest changes from remote..."
+    git fetch origin
+    
+    # Check if we're behind the remote
+    LOCAL_COMMIT=$(git rev-parse HEAD 2>/dev/null || echo "")
+    REMOTE_COMMIT=$(git rev-parse origin/main 2>/dev/null || echo "")
+    
+    if [[ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" && -n "$REMOTE_COMMIT" ]]; then
+        echo "⚠️  Local branch is different from remote. Attempting to merge..."
+        
+        # Try to pull with rebase to avoid merge commits
+        if git pull --rebase origin main; then
+            echo "✅ Successfully synchronized with remote"
+        else
+            echo "⚠️  Merge conflicts detected. Please resolve manually."
+            echo "💡 Run: git pull origin main"
+            exit 1
+        fi
+    fi
+    
+    # Check if there are any changes to push
+    if git diff --staged --quiet && git diff HEAD origin/main --quiet 2>/dev/null; then
+        echo "📝 No new changes to push"
+    else
+        echo "🚀 Pushing changes to repository..."
+        
+        # Create a new commit with current timestamp if there are changes
+        TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+        git commit -m "Update: $TIMESTAMP
+
+🤖 Generated with Claude Code
+
+Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || echo "📝 No additional changes to commit"
+        
+        # Push to remote
+        git push origin main
+        echo "✅ Changes pushed successfully"
+    fi
 fi
 
 
