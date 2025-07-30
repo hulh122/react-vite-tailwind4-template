@@ -7,12 +7,22 @@ REPO_DESCRIPTION=""
 GITHUB_USERNAME=""
 GITHUB_TOKEN=""
 
+# Load environment variables from .env.local if it exists
+if [[ -f ".env.local" ]]; then
+    echo "📄 Loading environment variables from .env.local..."
+    source .env.local
+fi
+
 usage() {
     echo "Usage: $0 -n <project-name> -d <description> [-u <github-username>] [-t <github-token>]"
     echo "  -n: Project name (required)"
     echo "  -d: Repository description (required)"
     echo "  -u: GitHub username (optional, will use gh auth status if not provided)"
-    echo "  -t: GitHub token (optional, for direct token authentication)"
+    echo "  -t: GitHub token (optional, can also be set in .env.local as GITHUB_TOKEN)"
+    echo ""
+    echo "Environment file (.env.local) example:"
+    echo "  GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx"
+    echo "  GITHUB_USERNAME=your-username"
     exit 1
 }
 
