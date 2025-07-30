@@ -1,1 +1,0 @@
-// Test setup for happy-dom environment
